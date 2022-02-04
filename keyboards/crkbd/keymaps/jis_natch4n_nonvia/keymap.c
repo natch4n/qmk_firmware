@@ -89,23 +89,15 @@ bool tap_my_symbol(uint16_t keycode, keyrecord_t *record) {
         bool shift  = lshift | rshift;
         uint16_t stey_code = my_symbols[index][shift ? 2 : 1];
         if(((stey_code & QK_LSFT) == QK_LSFT) | ((stey_code & QK_RSFT) == QK_RSFT)) {
-            if(shift) {
-                tap_code(stey_code);
-            }else{
-                register_code(KC_LSFT);
-                tap_code(stey_code);
-                unregister_code(KC_LSFT);
-            }
+            if(!shift) register_code(KC_LSFT);
+            tap_code(stey_code);
+            if(!shift) unregister_code(KC_LSFT);
         }else {
-            if(shift) {
-                if(lshift) unregister_code(KC_LSFT);
-                if(rshift) unregister_code(KC_RSFT);
-                tap_code(stey_code);
-                if(lshift) register_code(KC_LSFT);
-                if(rshift) register_code(KC_RSFT);
-            }else {
-                tap_code(stey_code);
-            }
+            if(lshift) unregister_code(KC_LSFT);
+            if(rshift) unregister_code(KC_RSFT);
+            tap_code(stey_code);
+            if(lshift) register_code(KC_LSFT);
+            if(rshift) register_code(KC_RSFT);
         }
     }else {
         tap_code(my_symbols[index][0]);
@@ -179,6 +171,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 #define L_RAISE 4
 #define L_ADJUST 8
 
+#ifdef OLED_ENABLE
 void oled_render_layer_state(void) {
     oled_write_P(user_state.jpmode ? PSTR(" JP:") : PSTR(" US:"), false);
     switch (layer_state) {
@@ -271,11 +264,14 @@ bool oled_task_user(void) {
     }
     return false;
 }
+#endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    #ifdef OLED_ENABLE
     if (user_state.keylogging & record->event.pressed) {
         set_keylog(keycode, record);
     }
+    #endif
     if(keycode <= KC_Z) return true;
     if(!tap_my_symbol(keycode, record)) return false;
 

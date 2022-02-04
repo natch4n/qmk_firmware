@@ -43,6 +43,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define OLED_FONT_H "keyboards/crkbd/lib/glcdfont.c"
 
-//for custom transaction
+#define PREVENT_STUCK_MODIFIERS
 
+//for custom transaction
+#ifdef USER_DEBUG_MODE
 #define SPLIT_TRANSACTION_IDS_USER USER_SYNC_A
+#endif
