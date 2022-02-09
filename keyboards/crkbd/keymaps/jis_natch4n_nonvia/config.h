@@ -49,3 +49,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef USER_DEBUG_MODE
 #define SPLIT_TRANSACTION_IDS_USER USER_SYNC_A
 #endif
+
+enum my_key{
+    //universal utils
+    MY_ZKHK,
+    MY_CAPS,
+
+    //user utils
+    MY_JP,
+    MY_OLED,
+
+    //user tap dance key
+    TD_RALT,
+
+    MY_SAFE_RANGE
+};
+
+#define SAFE_RANGE_FOR_US2JP MY_SAFE_RANGE

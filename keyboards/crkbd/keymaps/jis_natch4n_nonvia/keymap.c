@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include QMK_KEYBOARD_H
 #include <config.h>
 #include <stdint.h>
-#include <keymap_jp.h>
 #include <transactions.h>
+#include "us2jp.c"
 
 typedef struct user_runtime_config {
     bool jpmode, keylogging;
@@ -32,102 +32,28 @@ user_runtime_config user_state = {
     .keylogging = false
 };
 
-enum user_key{
-    //universal symbol keys
-    MY_2 = SAFE_RANGE,
-    MY_6,
-    MY_7,
-    MY_8,
-    MY_9,
-    MY_0,
-    MY_MINS,
-    MY_EQL,
-    MY_LBRC,
-    MY_RBRC,
-    MY_BSLS,
-    MY_SCLN,
-    MY_QUOT,
-    MY_GRV,
-
-    //universal utils
-    MY_ZKHK,
-    MY_CAPS,
-
-    //user utils
-    MY_JP,
-    MY_OLED
-};
-
-//keycode US or JP
-const uint16_t my_symbols[14][3] = {
-    {KC_2   , JP_2   , JP_AT  },
-    {KC_6   , JP_6   , JP_CIRC},
-    {KC_7   , JP_7   , JP_AMPR},
-    {KC_8   , JP_8   , JP_ASTR},
-    {KC_9   , JP_9   , JP_LPRN},
-    {KC_0   , JP_0   , JP_RPRN},
-    {KC_MINS, JP_MINS, JP_UNDS},
-    {KC_EQL , JP_EQL , JP_PLUS},
-    {KC_LBRC, JP_LBRC, JP_LCBR},
-    {KC_RBRC, JP_RBRC, JP_RCBR},
-    {KC_BSLS, JP_BSLS, JP_PIPE},
-    {KC_SCLN, JP_SCLN, JP_COLN},
-    {KC_QUOT, JP_QUOT, JP_DQUO},
-    {KC_GRV , JP_GRV , JP_TILD}
-};
-
-const int symbol_array_size = sizeof(my_symbols) / sizeof(uint16_t[3]);
-
-bool tap_my_symbol(uint16_t keycode, keyrecord_t *record) {
-    if(!record->event.pressed) return true;
-    uint16_t index = keycode - MY_2;
-    if(symbol_array_size <= index) return true;
-
-    if(user_state.jpmode) {
-        bool lshift = get_mods() & MOD_BIT(KC_LSFT);
-        bool rshift = get_mods() & MOD_BIT(KC_RSFT);
-        bool shift  = lshift | rshift;
-        uint16_t stey_code = my_symbols[index][shift ? 2 : 1];
-        if(((stey_code & QK_LSFT) == QK_LSFT) | ((stey_code & QK_RSFT) == QK_RSFT)) {
-            if(!shift) register_code(KC_LSFT);
-            tap_code(stey_code);
-            if(!shift) unregister_code(KC_LSFT);
-        }else {
-            if(lshift) unregister_code(KC_LSFT);
-            if(rshift) unregister_code(KC_RSFT);
-            tap_code(stey_code);
-            if(lshift) register_code(KC_LSFT);
-            if(rshift) register_code(KC_RSFT);
-        }
-    }else {
-        tap_code(my_symbols[index][0]);
-    }
-    return false;
-}
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [0] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        KC_ESC,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  KC_BSPC,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,    KC_K,    KC_L, MY_SCLN, MY_MINS,
+      KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,    KC_K,    KC_L,U2J_SCLN,U2J_MINS,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        KC_TAB,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, MY_ZKHK,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           KC_LCTL,   MO(1),  KC_SPC,     KC_ENT,   MO(2), KC_RALT
                                       //`--------------------------'  `--------------------------'
-
   ),
 
   [1] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-       KC_ESC,    KC_1,    MY_2,    KC_3,    KC_4,    KC_5,                         MY_6,    MY_7,    MY_8,    MY_9,    MY_0, KC_BSPC,
+       KC_ESC,    KC_1,    U2J_2,    KC_3,   KC_4,    KC_5,                        U2J_6,   U2J_7,   U2J_8,   U2J_9,   U2J_0, KC_BSPC,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                       MY_GRV,  MY_EQL, MY_LBRC, MY_RBRC, MY_SCLN, MY_MINS,
+      KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  KC_DEL,                      U2J_GRV, U2J_EQL,U2J_LBRC,U2J_RBRC,U2J_SCLN,U2J_MINS,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       KC_TAB, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      MY_BSLS, MY_QUOT, KC_COMM,  KC_DOT, KC_SLSH, MY_ZKHK,
+       KC_TAB, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     U2J_BSLS,U2J_QUOT, KC_COMM,  KC_DOT, KC_SLSH, MY_ZKHK,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LCTL, _______,  KC_SPC,     KC_ENT,   MO(3), KC_RALT
+                                          KC_LCTL, KC_TRNS,  KC_SPC,     KC_ENT,   MO(3), KC_RALT
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -139,7 +65,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        KC_TAB,   KC_F3,   KC_F6,   KC_F9,  KC_F12, KC_SLCK,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MY_ZKHK,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LCTL,   MO(3),  KC_SPC,     KC_ENT, _______, KC_RALT
+                                          KC_LCTL,   MO(3),  KC_SPC,     KC_ENT, KC_TRNS, KC_RALT
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -151,10 +77,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LCTL, _______,  KC_SPC,     KC_ENT, _______, KC_RALT
+                                          KC_LCTL, KC_TRNS,  KC_SPC,     KC_ENT, KC_TRNS, KC_RALT
                                       //`--------------------------'  `--------------------------'
   )
-
 };
 
 #include <stdio.h>
@@ -266,15 +191,7 @@ bool oled_task_user(void) {
 }
 #endif
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    #ifdef OLED_ENABLE
-    if (user_state.keylogging & record->event.pressed) {
-        set_keylog(keycode, record);
-    }
-    #endif
-    if(keycode <= KC_Z) return true;
-    if(!tap_my_symbol(keycode, record)) return false;
-
+bool tap_my_code(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case MY_ZKHK:
             if(!record->event.pressed) return false;
@@ -318,29 +235,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-#ifdef USER_DEBUG_MODE
-void config_copy(struct user_runtime_config *dst, struct user_runtime_config *src) {
-    dst->jpmode = src->jpmode;
-    dst->keylogging = src->keylogging;
-}
 
-
-void user_sync_a_slave_handler(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data) {
-    config_copy(&user_state, (user_runtime_config*)in_data);
-}
-
-void keyboard_post_init_user(void) {
-    transaction_register_rpc(USER_SYNC_A, user_sync_a_slave_handler);
-}
-
-void housekeeping_task_user(void){
-    if(!is_keyboard_master()){
-        static uint32_t last_sync;
-        if(timer_elapsed32(last_sync) > 500) {
-            transaction_rpc_send(USER_SYNC_A, sizeof(user_state), &user_state);
-            last_sync = timer_read32();
-        }
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    #ifdef OLED_ENABLE
+    if (user_state.keylogging & record->event.pressed) {
+        set_keylog(keycode, record);
     }
-}
-#endif
+    #endif
 
+    if(keycode <= KC_Z) return true;
+    if(!tap_jp_code(keycode, record)) return false;
+    if(!tap_my_code(keycode, record)) return false;
+
+    return true;
+}
