@@ -65,4 +65,4 @@ enum my_key{
     MY_SAFE_RANGE
 };
 
-#define SAFE_RANGE_FOR_US2JP MY_SAFE_RANGE
+#define SAFE_RANGE_FOR_U2J MY_SAFE_RANGE

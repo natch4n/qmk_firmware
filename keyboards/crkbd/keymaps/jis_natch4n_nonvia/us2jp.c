@@ -1,29 +1,11 @@
 #include QMK_KEYBOARD_H
 #include <keymap_jp.h>
 #include "config.h"
-
-enum user_key{
-    //symbol keys
-    U2J_2 = SAFE_RANGE_FOR_US2JP,
-    U2J_6,
-    U2J_7,
-    U2J_8,
-    U2J_9,
-    U2J_0,
-    U2J_MINS,
-    U2J_EQL,
-    U2J_LBRC,
-    U2J_RBRC,
-    U2J_BSLS,
-    U2J_SCLN,
-    U2J_QUOT,
-    U2J_GRV,
-    U2J_SAFERANGE
-};
+#include "us2jp.h"
 
 #ifdef US2JP_ENABLE_NATIVE_CONVERT
-
-const uint16_t my_symbols[14][3] = {
+#define SYMBOL_MAP_SIZE (U2J_SAFE_RANGE - SAFE_RANGE_FOR_U2J)
+const uint16_t jp_symbol_map[SYMBOL_MAP_SIZE][2] = {
     {JP_2   , JP_AT  },
     {JP_6   , JP_CIRC},
     {JP_7   , JP_AMPR},
@@ -40,25 +22,55 @@ const uint16_t my_symbols[14][3] = {
     {JP_GRV , JP_TILD}
 };
 
-const int symbol_array_size = sizeof(my_symbols) / sizeof(uint16_t[2]);
+const uint16_t us_symbol_map[SYMBOL_MAP_SIZE] = {
+    KC_2,
+    KC_6,
+    KC_7,
+    KC_8,
+    KC_9,
+    KC_0,
+    KC_MINS,
+    KC_EQL,
+    KC_LBRC,
+    KC_RBRC,
+    KC_BSLS,
+    KC_SCLN,
+    KC_QUOT,
+    KC_GRV
+};
 
-bool native_convert(uint16_t keycode, keyrecord_t *record) {
-    uint16_t index = keycode - MY_2;
-    if(symbol_array_size <= index) return false;
+uint16_t get_symbol_index(uint16_t keycode) {
+    return keycode - SAFE_RANGE_FOR_U2J;
+}
+
+
+bool tap_u2j_code_as_jp(uint16_t keycode, keyrecord_t *record) {
+    if(!record->event.pressed) return true;
+    uint16_t index = get_symbol_index(keycode);
+    if(SYMBOL_MAP_SIZE <= index) return true;
 
     bool lshift = get_mods() & MOD_BIT(KC_LSFT);
     bool rshift = get_mods() & MOD_BIT(KC_RSFT);
     bool shift  = lshift | rshift;
-    uint16_t stey_code = my_symbols[index][shift ? 2 : 1];
+    uint16_t stey_code = jp_symbol_map[index][shift ? 2 : 1];
 
     tap_stey_code(stey_code, lshift, rshift, shift);
 
-    return true;
+    return false;
+}
+
+bool tap_u2j_code_as_us(uint16_t keycode, keyrecord_t *record) {
+    if(!record->event.pressed) return true;
+    uint16_t index = get_symbol_index(keycode);
+    if(SYMBOL_MAP_SIZE <= index) return true;
+
+    tap_code(us_symbol_map[index]);
+    return false;
 }
 #endif
 
 #ifdef US2JP_ENABLE_UNIVERSAL_CONVERT
-bool universal_convert(uint16_t keycode, keyrecord_t *record) {
+bool tap_qmk_code_as_jp(uint16_t keycode, keyrecord_t *record) {
     bool lshift = get_mods() & MOD_BIT(KC_LSFT);
     bool rshift = get_mods() & MOD_BIT(KC_RSFT);
     bool shift = lshift | rshift;
@@ -87,12 +99,12 @@ bool universal_convert(uint16_t keycode, keyrecord_t *record) {
         case KC_TILD : k = JP_TILD; break;
         case KC_AMPR : k = JP_AMPR; break;
         case KC_CIRC : k = JP_CIRC; break;
-        default      : return false;
+        default      : return true;
     }
 
     tap_stey_code(keycode, lshift, rshift, shift);
 
-    return true;
+    return false;
 }
 #endif
 
@@ -109,17 +121,4 @@ void tap_stey_code(uint16_t keycode, bool lshift, bool rshift, bool shift) {
         if(rshift) register_code(KC_RSFT);
     }
     return;
-}
-
-bool tap_jp_code(uint16_t keycode, keyrecord_t *record) {
-    if(!record->event.pressed) return true;
-    #ifdef JP2US_ENABLE_NATIVE_CONVERT
-    if(native_convert(keycode, record)) return false;
-    #endif
-
-    #ifdef JP2US_ENABLE_UNIVERSAL_CONVERT
-    if(universal_convert(keycode, record)) return false;
-    #endif
-
-    return true;
 }

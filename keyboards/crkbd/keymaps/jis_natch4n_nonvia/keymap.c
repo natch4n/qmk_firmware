@@ -20,14 +20,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <config.h>
 #include <stdint.h>
 #include <transactions.h>
-#include "us2jp.c"
+#include "us2jp.h"
 
-typedef struct user_runtime_config {
+typedef struct user_state{
     bool jpmode, keylogging;
-} user_runtime_config;
+} user_state;
 
-
-user_runtime_config user_state = {
+user_state current_state = {
     .jpmode = true,
     .keylogging = false
 };
@@ -98,7 +97,7 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
 
 #ifdef OLED_ENABLE
 void oled_render_layer_state(void) {
-    oled_write_P(user_state.jpmode ? PSTR(" JP:") : PSTR(" US:"), false);
+    oled_write_P(current_state.jpmode ? PSTR(" JP:") : PSTR(" US:"), false);
     switch (layer_state) {
         case L_BASE:
             oled_write_ln_P(PSTR("Default"), false);
@@ -183,7 +182,7 @@ void oled_render_toggle_and_layer(led_t led_state) {
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         oled_render_toggle_and_layer(host_keyboard_led_state());
-        if(user_state.keylogging) oled_render_keylog();
+        if(current_state.keylogging) oled_render_keylog();
     } else {
         oled_render_logo();
     }
@@ -195,7 +194,7 @@ bool tap_my_code(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case MY_ZKHK:
             if(!record->event.pressed) return false;
-            if(user_state.jpmode | ((get_mods() & MOD_BIT(KC_RALT)) | (get_mods() & MOD_BIT(KC_LALT)))) {
+            if(current_state.jpmode | ((get_mods() & MOD_BIT(KC_RALT)) | (get_mods() & MOD_BIT(KC_LALT)))) {
                 tap_code(KC_GRV);
                 return false;
             }else {
@@ -208,7 +207,7 @@ bool tap_my_code(uint16_t keycode, keyrecord_t *record) {
 
         case MY_CAPS:
             if(!record->event.pressed) return false;
-            if((!user_state.jpmode) | ((get_mods() & MOD_BIT(KC_LSFT)) | (get_mods() & MOD_BIT(KC_RSFT)))) {
+            if((!current_state.jpmode) | ((get_mods() & MOD_BIT(KC_LSFT)) | (get_mods() & MOD_BIT(KC_RSFT)))) {
                 tap_code(KC_CAPS);
                 return false;
             }else {
@@ -221,14 +220,14 @@ bool tap_my_code(uint16_t keycode, keyrecord_t *record) {
 
         case MY_JP:
             if(!record->event.pressed) return false;
-            user_state.jpmode = !user_state.jpmode;
+            current_state.jpmode = !current_state.jpmode;
             return false;
             break;
 
         case MY_OLED:
             if(!record->event.pressed) return false;
-            user_state.keylogging = !user_state.keylogging;
-            if(!user_state.keylogging) oled_clear();
+            current_state.keylogging = !current_state.keylogging;
+            if(!current_state.keylogging) oled_clear();
             return false;
             break;
     }
@@ -238,13 +237,20 @@ bool tap_my_code(uint16_t keycode, keyrecord_t *record) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     #ifdef OLED_ENABLE
-    if (user_state.keylogging & record->event.pressed) {
+    if (current_state.keylogging & record->event.pressed) {
         set_keylog(keycode, record);
     }
     #endif
 
     if(keycode <= KC_Z) return true;
-    if(!tap_jp_code(keycode, record)) return false;
+
+    #ifdef US2_JP_ENABLE_NATIVE_CONVERT
+    if(current_state.jpmode) {
+        if(!tap_u2j_code_as_jp(keycode, *record)) return false;
+    } else (
+        if(!tap_u2j_code_as_us(keycode, *record)) return false;
+    )
+    #endif
     if(!tap_my_code(keycode, record)) return false;
 
     return true;
