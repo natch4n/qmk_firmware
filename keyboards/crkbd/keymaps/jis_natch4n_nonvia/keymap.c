@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <config.h>
 #include <stdint.h>
 #include <transactions.h>
+#include <process_tap_dance.h>
+
+#include "user_config.h"
 #include "us2jp.h"
 
 typedef struct user_state{
@@ -40,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, MY_ZKHK,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                           KC_TAB,   MO(1),  KC_SPC,     KC_ENT,   MO(2), KC_RALT
+                                           KC_TAB,   MO(1),  KC_SPC,     KC_ENT,   MO(2), TD_RALT
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -52,7 +55,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LCTL, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     U2J_BSLS,U2J_QUOT, KC_COMM,  KC_DOT, KC_SLSH, MY_ZKHK,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                           KC_TAB, KC_TRNS,  KC_SPC,     KC_ENT,   MO(3), KC_RALT
+                                           KC_TAB, KC_TRNS,  KC_SPC,     KC_ENT,   MO(3), TD_RALT
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -64,7 +67,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LCTL,   KC_F3,   KC_F6,   KC_F9,  KC_F12, KC_SLCK,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MY_ZKHK,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                           KC_TAB,   MO(3),  KC_SPC,     KC_ENT, KC_TRNS, KC_RALT
+                                           KC_TAB,   MO(3),  KC_SPC,     KC_ENT, KC_TRNS, TD_RALT
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -76,7 +79,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                           KC_TAB, KC_TRNS,  KC_SPC,     KC_ENT, KC_TRNS, KC_RALT
+                                           KC_TAB, KC_TRNS,  KC_SPC,     KC_ENT, KC_TRNS, TD_RALT
                                       //`--------------------------'  `--------------------------'
   )
 };
@@ -190,6 +193,10 @@ bool oled_task_user(void) {
 }
 #endif
 
+qk_tap_dance_action_t tap_dance_actions[] = {
+    [TD_RALT_GUI] = ACTION_TAP_DANCE_DOUBLE(KC_RALT, KC_RGUI)
+};
+
 bool tap_my_code(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case MY_ZKHK:
@@ -244,13 +251,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     if(keycode <= KC_Z) return true;
 
-    #ifdef US2_JP_ENABLE_NATIVE_CONVERT
     if(current_state.jpmode) {
-        if(!tap_u2j_code_as_jp(keycode, *record)) return false;
-    } else (
-        if(!tap_u2j_code_as_us(keycode, *record)) return false;
-    )
-    #endif
+        if(!tap_u2j_code_as_jp(keycode, record)) return false;
+    } else {
+        if(!tap_u2j_code_as_us(keycode, record)) return false;
+    }
+
     if(!tap_my_code(keycode, record)) return false;
 
     return true;

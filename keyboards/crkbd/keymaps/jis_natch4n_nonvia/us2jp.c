@@ -1,10 +1,12 @@
 #include QMK_KEYBOARD_H
 #include <keymap_jp.h>
 #include "config.h"
+#include "user_config.h"
 #include "us2jp.h"
 
 #ifdef US2JP_ENABLE_NATIVE_CONVERT
 #define SYMBOL_MAP_SIZE (U2J_SAFE_RANGE - SAFE_RANGE_FOR_U2J)
+
 const uint16_t jp_symbol_map[SYMBOL_MAP_SIZE][2] = {
     {JP_2   , JP_AT  },
     {JP_6   , JP_CIRC},
@@ -52,7 +54,7 @@ bool tap_u2j_code_as_jp(uint16_t keycode, keyrecord_t *record) {
     bool lshift = get_mods() & MOD_BIT(KC_LSFT);
     bool rshift = get_mods() & MOD_BIT(KC_RSFT);
     bool shift  = lshift | rshift;
-    uint16_t stey_code = jp_symbol_map[index][shift ? 2 : 1];
+    uint16_t stey_code = jp_symbol_map[index][shift ? 1 : 0];
 
     tap_stey_code(stey_code, lshift, rshift, shift);
 
