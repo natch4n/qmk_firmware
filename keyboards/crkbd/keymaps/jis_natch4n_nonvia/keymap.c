@@ -193,8 +193,37 @@ bool oled_task_user(void) {
 }
 #endif
 
+void td_ralt_gui_finish(qk_tap_dance_state_t *state, void *user_data) {
+    switch(state -> count) {
+        case 1:
+            register_code(KC_RALT);
+            break;
+        case 2:
+            register_code(KC_RGUI);
+            tap_code(KC_X);
+            unregister_code(KC_RGUI);
+            break;
+        default :
+            register_code(KC_RGUI);
+            break;
+    }
+}
+
+void td_ralt_gui_release(qk_tap_dance_state_t *state, void *user_data) {
+    switch (state -> count) {
+    case 1:
+        unregister_code(KC_RALT);
+        break;
+    case 2:
+        break;
+    default :
+        unregister_code(KC_RGUI);
+        break;
+    }
+}
+
 qk_tap_dance_action_t tap_dance_actions[] = {
-    [TD_RALT_GUI] = ACTION_TAP_DANCE_DOUBLE(KC_RALT, KC_RGUI)
+    [TD_RALT_GUI] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, td_ralt_gui_finish, td_ralt_gui_release)
 };
 
 bool tap_my_code(uint16_t keycode, keyrecord_t *record) {
