@@ -111,7 +111,7 @@ bool tap_qmk_code_as_jp(uint16_t keycode, keyrecord_t *record) {
 #endif
 
 void tap_stey_code(uint16_t keycode, bool lshift, bool rshift, bool shift) {
-        if(((keycode & QK_LSFT) == QK_LSFT) | ((keycode & QK_RSFT) == QK_RSFT)) {
+    if(((keycode & QK_LSFT) == QK_LSFT) | ((keycode & QK_RSFT) == QK_RSFT)) {
         if(!shift) register_code(KC_LSFT);
         tap_code(keycode);
         if(!shift) unregister_code(KC_LSFT);
