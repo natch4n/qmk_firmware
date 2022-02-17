@@ -21,9 +21,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include <transactions.h>
 #include <process_tap_dance.h>
+#include <rgblight.h>
 
 #include "user_config.h"
 #include "us2jp.h"
+#include "rgb_urainbow.h"
 
 typedef struct user_state{
     bool jpmode, keylogging;
@@ -289,4 +291,42 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     if(!tap_my_code(keycode, record)) return false;
 
     return true;
+}
+
+void keyboard_post_init_user(void) {
+    rgblight_sethsv(0, 0, 0);
+}
+
+#define USER_RGBLED_REFLESH_RATE 125
+#define USER_RGBLED_DISABLE_TIME 300000
+
+void clear_rgbled(void) {
+    RGB rgb_off;
+    rgb_off.r = 0;
+    rgb_off.g = 0;
+    rgb_off.b = 0;
+    for(int i = 0; i < RGBLED_NUM; i++) {
+        led[i] = rgb_off;
+    }
+    rgblight_set();
+}
+
+void housekeeping_task_user(void) {
+    static uint32_t last_effect_refleshed = 0;
+    static bool user_effect_enabled = false;
+
+    if(timer_elapsed32(last_effect_refleshed) > USER_RGBLED_REFLESH_RATE) {
+        if(last_input_activity_elapsed() < USER_RGBLED_DISABLE_TIME) {
+            reflesh_effect();
+            user_effect_enabled = true;
+        }else if(user_effect_enabled) {
+            clear_rgbled();
+            user_effect_enabled = false;
+        }
+        last_effect_refleshed = timer_read32();
+    }
+}
+
+void suspend_power_down_user(void){
+    clear_rgbled();
 }
