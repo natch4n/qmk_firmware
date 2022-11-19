@@ -37,6 +37,7 @@ user_state current_state = {
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+  /*QWERTY
   [0] = LAYOUT_split_3x6_3(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
        KC_ESC,    KC_Q,    KC_W,    KC_E,    KC_R,    KC_T,                         KC_Y,    KC_U,    KC_I,    KC_O,   KC_P,  KC_BSPC,
@@ -45,7 +46,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        KC_TAB,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, MY_ZKHK,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                         KC_LCTRL,   MO(1),  KC_SPC,     KC_ENT,   MO(2), TD_RALT
+                                          TD_RALT,   MO(1),  KC_SPC,     KC_ENT,   MO(2), KC_RCTL
+                                      //`--------------------------'  `--------------------------'
+  ),
+  */
+ /*Eucalyn
+ [0] = LAYOUT_split_3x6_3(
+  //,-----------------------------------------------------.                    ,-----------------------------------------------------.
+       KC_ESC,    KC_Q,    KC_W, KC_COMM,  KC_DOT,U2J_SCLN,                         KC_M,    KC_R,    KC_D,    KC_Y,    KC_P, KC_BSPC,
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+      KC_LSFT,    KC_A,    KC_O,    KC_E,    KC_I,    KC_U,                         KC_G,    KC_T,    KC_K,    KC_S,    KC_N,U2J_MINS,
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+       KC_TAB,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_F,                         KC_B,    KC_H,    KC_J,    KC_L, KC_SLSH, MY_ZKHK,
+  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
+                                          TD_RALT,   MO(1),  KC_SPC,     KC_ENT,   MO(2), KC_RCTL
+                                      //`--------------------------'  `--------------------------'
+  ),
+  */
+  //Astalte
+   [0] = LAYOUT_split_3x6_3(
+  //,-----------------------------------------------------.                    ,-----------------------------------------------------.
+       KC_ESC,    KC_Q,    KC_P,    KC_U,    KC_Y, KC_COMM,                         KC_J,    KC_D,    KC_H,    KC_G,    KC_W, KC_BSPC,
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+      KC_LSFT,    KC_I,    KC_O,    KC_E,    KC_A,  KC_DOT,                         KC_K,    KC_T,    KC_N,    KC_S,    KC_R,U2J_MINS,
+  //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
+       KC_TAB,    KC_Z,    KC_X,U2J_SCLN,    KC_C,U2J_SCLN,                         KC_M,    KC_L,    KC_F,    KC_B,    KC_V, MY_ZKHK,
+  //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
+                                          TD_RALT,   MO(1),  KC_SPC,     KC_ENT,   MO(2), KC_RCTL
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -55,9 +82,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, S(KC_TAB),KC_DEL,                      U2J_GRV, U2J_EQL,U2J_LBRC,U2J_RBRC,U2J_SCLN,U2J_MINS,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-       KC_TAB, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     U2J_BSLS,U2J_QUOT, KC_COMM,  KC_DOT, KC_SLSH, MY_ZKHK,
+       KC_TAB, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_PSCR,                     U2J_BSLS,U2J_QUOT, KC_COMM,  KC_DOT, KC_SLSH, MY_ZKHK,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LCTL, KC_TRNS,  KC_SPC,     KC_ENT,   MO(3), TD_RALT
+                                          TD_RALT, KC_TRNS,  KC_SPC,     KC_ENT,   MO(3), KC_RCTL
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -69,7 +96,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
        KC_TAB,   KC_F3,   KC_F6,   KC_F9,  KC_F12, KC_SLCK,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, MY_ZKHK,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LCTL,   MO(3),  KC_SPC,     KC_ENT, KC_TRNS, TD_RALT
+                                          TD_RALT,   MO(3),  KC_SPC,     KC_ENT, KC_TRNS, KC_RCTL
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -81,9 +108,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          KC_LCTL, KC_TRNS,  KC_SPC,     KC_ENT, KC_TRNS, TD_RALT
+                                          TD_RALT, KC_TRNS,  KC_SPC,     KC_ENT, KC_TRNS, KC_RCTL
                                       //`--------------------------'  `--------------------------'
-  )
+  ),
 };
 
 #include <stdio.h>
@@ -313,9 +340,10 @@ void clear_rgbled(void) {
 
 void housekeeping_task_user(void) {
     static uint32_t last_effect_refleshed = 0;
+    static bool user_effect_active = false;
     static bool user_effect_enabled = false;
 
-    if(timer_elapsed32(last_effect_refleshed) > USER_RGBLED_REFLESH_RATE) {
+    if(user_effect_active&(timer_elapsed32(last_effect_refleshed) > USER_RGBLED_REFLESH_RATE)) {
         if(last_input_activity_elapsed() < USER_RGBLED_DISABLE_TIME) {
             reflesh_effect();
             user_effect_enabled = true;

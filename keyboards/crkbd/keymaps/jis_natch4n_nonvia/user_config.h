@@ -10,6 +10,9 @@ enum my_key {
     MY_JP,
     MY_OLED,
 
+    //user hold
+    MY_SFTMIN,
+
     MY_SAFE_RANGE
 };
 
